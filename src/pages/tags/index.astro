@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import { getPublishedPosts, getAllTags, getAllCategories } from '../../utils/posts';
+import { withBase } from '../../utils/url';
+
+const posts = await getPublishedPosts();
+const tags = getAllTags(posts);
+const categories = getAllCategories(posts);
+---
+<BaseLayout active="tags" title="Tags" description="Browse posts by tag and category.">
+  <PageHero title="Tags" description="Browse posts by topic, tag and category." />
+  <div class="container-narrow wrap">
+    {tags.length === 0 && categories.length === 0 && <p class="none">No tags yet.</p>}
+    {tags.length > 0 && (
+      <section aria-labelledby="h-tags">
+        <h2 id="h-tags">Tags</h2>
+        <ul class="cloud">
+          {tags.map((t, i) => (
+            <li><a class:list={['chip', i % 2 === 0 ? 'green' : 'blue']} href={withBase(`/tags/${t.slug}/`)}>
+              <span>{t.tag}</span><span class="count">{t.count}</span></a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+    {categories.length > 0 && (
+      <section aria-labelledby="h-cats">
+        <h2 id="h-cats">Categories</h2>
+        <ul class="cloud">
+          {categories.map((c, i) => (
+            <li><a class:list={['chip', i % 2 === 0 ? 'green' : 'blue']} href={withBase(`/tags/${c.slug}/`)}>
+              <span>{c.name}</span><span class="count">{c.count}</span></a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .wrap { padding-top: 40px; padding-bottom: 64px; text-align: center; }
+  section + section { margin-top: 48px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 0 0 20px; color: var(--text-primary); }
+  .cloud { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 8px 0 18px;
+    border-radius: var(--radius-full); font-size: 15px; font-weight: 500; text-decoration: none;
+    border: 1px solid transparent;
+    transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+  }
+  .chip.green { background: var(--accent-soft); color: var(--accent-text); }
+  .chip.blue { background: var(--blue-soft); color: var(--blue-text); }
+  .chip:hover { box-shadow: var(--shadow-hover); border-color: currentColor; }
+  .count {
+    min-width: 26px; height: 26px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-full); background: var(--surface); color: var(--text-secondary);
+    font-size: 12px; font-weight: 600;
+  }
+  .none { color: var(--text-muted); }
+  @media (prefers-reduced-motion: reduce) { .chip { transition: none; } }
+</style>

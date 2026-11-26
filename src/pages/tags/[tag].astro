@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import PostCard from '../../components/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import { getPublishedPosts, getAllTags, getAllCategories, tagSlug } from '../../utils/posts';
+import { withBase } from '../../utils/url';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  const names = new Map<string, string>(); // slug -> display name
+  for (const t of getAllTags(posts)) names.set(t.slug, t.tag);
+  for (const c of getAllCategories(posts)) if (!names.has(c.slug)) names.set(c.slug, c.name);
+  return [...names].map(([slug, name]) => ({
+    params: { tag: slug },
+    props: {
+      name,
+      posts: posts.filter(
+        (p) => tagSlug(p.data.category) === slug || p.data.tags.some((t) => tagSlug(t) === slug),
+      ),
+    },
+  }));
+}
+
+const { name, posts } = Astro.props;
+const n = posts.length;
+---
+<BaseLayout active="tags" title={`#${name}`} description={`${n} ${n === 1 ? 'post' : 'posts'} tagged ${name}`}>
+  <PageHero title={`#${name}`} description={`${n} ${n === 1 ? 'post' : 'posts'} tagged ${name}`} />
+  <div class="container-narrow wrap">
+    <p class="back"><a href={withBase('/tags/')}><Icon name="ArrowLeft" size={16} /> All tags</a></p>
+    <ul class="list">
+      {posts.map((post) => <li><PostCard post={post} /></li>)}
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .wrap { padding-top: 32px; padding-bottom: 64px; }
+  .back { margin: 0 0 20px; font-size: 15px; font-weight: 500; }
+  .back a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .back a:hover { text-decoration: underline; }
+  .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+</style>

@@ -1,0 +1,20 @@
+---
+import { SITE } from '../config';
+import { withBase } from '../utils/url';
+import Icon from './Icon.astro';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <span>&copy; {year} {SITE.author}</span>
+    <a href={withBase('/rss.xml')} class="rss"><Icon name="Rss" size={14} /> RSS</a>
+  </div>
+</footer>
+
+<style>
+  .footer { margin-top: 64px; border-top: 1px solid var(--border); padding: 20px 0; font-size: 14px; color: var(--text-muted); }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .rss { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; }
+  .rss:hover { color: var(--accent); }
+</style>

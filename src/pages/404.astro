@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { withBase } from '../utils/url';
+---
+<BaseLayout title="Page not found" active={null}>
+  <div class="container-narrow nf">
+    <p class="code">404</p>
+    <h1>Page not found</h1>
+    <p class="msg">The page you are looking for does not exist, or may have moved.</p>
+    <a class="home" href={withBase('/')}><Icon name="ArrowLeft" size={16} /> Back to all posts</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .nf { text-align: center; padding: 96px 16px 120px; }
+  .code {
+    margin: 0; font-size: clamp(64px, 14vw, 120px); font-weight: 800; line-height: 1; letter-spacing: -0.04em;
+    background: var(--gradient-brand); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  h1 { margin: 16px 0 8px; font-size: 28px; font-weight: 800; }
+  .msg { margin: 0 0 28px; color: var(--text-secondary); }
+  .home {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius-full);
+    background: var(--accent-soft); color: var(--accent-text); font-weight: 600; text-decoration: none;
+  }
+  .home:hover { background: var(--accent); color: #fff; }
+</style>

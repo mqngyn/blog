@@ -1,0 +1,71 @@
+---
+import Icon from './Icon.astro';
+---
+
+<button type="button" class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false" data-theme-toggle>
+  <span class="knob" aria-hidden="true"></span>
+  <span class="ico ico-sun" aria-hidden="true"><Icon name="Sun" size={16} /></span>
+  <span class="ico ico-moon" aria-hidden="true"><Icon name="Moon" size={16} /></span>
+</button>
+
+<style>
+  .theme-toggle {
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    width: 60px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: var(--toggle-bg);
+    cursor: pointer;
+    flex: none;
+    transition: background var(--transition);
+  }
+  .ico {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--toggle-icon);
+    transition: color var(--transition);
+  }
+  .knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--toggle-knob);
+    box-shadow: 0 1px 3px rgb(15 23 42 / 0.25);
+    transition: transform var(--transition), background var(--transition);
+  }
+  :global([data-theme='dark']) .knob { transform: translateX(28px); }
+  :global(:root:not([data-theme='dark'])) .ico-sun { color: #15803d; }
+  :global([data-theme='dark']) .ico-moon { color: #0b1120; }
+</style>
+
+<script>
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+  const current = () => (root.dataset.theme === 'dark' ? 'dark' : 'light');
+  const sync = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(current() === 'dark')));
+  sync();
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const theme = current() === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = theme;
+      try {
+        localStorage.setItem('theme', theme);
+      } catch (e) {
+        /* storage unavailable */
+      }
+      sync();
+      window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
+    }),
+  );
+</script>

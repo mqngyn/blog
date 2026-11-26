@@ -1,0 +1,81 @@
+---
+import HeroWaves from './HeroWaves.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  variant?: 'page' | 'article';
+  width?: 'narrow' | 'wide';
+}
+const { title, description, variant = 'page', width = 'narrow' } = Astro.props;
+---
+
+<section class:list={['hero', `hero-${variant}`]}>
+  <HeroWaves />
+  <div class:list={['hero-inner', width === 'wide' ? 'container' : 'container-narrow']}>
+    {variant === 'page' ? (
+      <div class="hero-page">
+        <span class="indicator" aria-hidden="true"></span>
+        <div class="hero-text">
+          {title && <h1>{title}</h1>}
+          {description && <p>{description}</p>}
+          <slot />
+        </div>
+      </div>
+    ) : (
+      <div class="hero-article"><slot /></div>
+    )}
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--gradient-hero);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    min-height: 180px;
+    padding-block: 36px;
+  }
+  .hero-article .hero-inner { align-items: flex-start; }
+  .hero-article.hero-inner, .hero-article { width: 100%; }
+  .hero-page { display: flex; align-items: stretch; gap: 20px; width: 100%; }
+  .indicator {
+    flex: none;
+    width: 4px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(180deg, #22c55e, #86efac);
+    min-height: 56px;
+  }
+  .hero-text { min-width: 0; max-width: 560px; }
+  h1 {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  p {
+    margin-top: 8px;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+  .hero-article .hero-inner { padding-block: 32px 28px; }
+  @media (max-width: 767px) {
+    .hero-inner { min-height: 150px; padding-block: 28px; }
+    h1 { font-size: 34px; }
+  }
+  @media (max-width: 479px) {
+    .hero-inner { min-height: 130px; padding-block: 24px; }
+    h1 { font-size: 30px; }
+    p { font-size: 16px; }
+    .hero-page { gap: 14px; }
+  }
+</style>

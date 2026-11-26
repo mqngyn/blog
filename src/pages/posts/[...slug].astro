@@ -1,0 +1,119 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import TagPill from '../../components/TagPill.astro';
+import Icon from '../../components/Icon.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import PostInfo from '../../components/PostInfo.astro';
+import RelatedPosts from '../../components/RelatedPosts.astro';
+import {
+  getPublishedPosts, getRelatedPosts, formatDate, readingMinutes, tagSlug,
+} from '../../utils/posts';
+import { withBase } from '../../utils/url';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const allPosts = await getPublishedPosts();
+const related = getRelatedPosts(post, allPosts, 3);
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
+const tocHeadings = (remarkPluginFrontmatter?.toc as typeof headings | undefined) ?? headings;
+const d = post.data;
+const hasToc = tocHeadings.some((h) => h.depth === 2 || h.depth === 3);
+---
+<BaseLayout active="posts" title={d.title} description={d.description}>
+  <PageHero variant="article" width="wide">
+    <header class="article-header">
+      <div class="pills">
+        <TagPill label={d.category} variant="category" size="md" href={withBase(`/tags/${tagSlug(d.category)}/`)} />
+        {d.tags.map((t, i) => (
+          <TagPill label={t} variant={i === 0 ? 'secondary' : 'tag'} size="md" href={withBase(`/tags/${tagSlug(t)}/`)} />
+        ))}
+      </div>
+      <h1>{d.title}</h1>
+      <p class="desc">{d.description}</p>
+      <div class="meta-row">
+        <span><Icon name="CalendarDays" size={16} /> <time datetime={d.pubDate.toISOString()}>{formatDate(d.pubDate)}</time></span>
+        <span><Icon name="Clock" size={16} /> ~ {readingMinutes(post)} min read</span>
+        {d.difficulty && (
+          <span><Icon name="ChartNoAxesColumn" size={16} /> Difficulty: <strong class="diff">{d.difficulty}</strong></span>
+        )}
+        {d.updatedDate && (
+          <span><Icon name="CalendarClock" size={16} /> Updated <time datetime={d.updatedDate.toISOString()}>{formatDate(d.updatedDate)}</time></span>
+        )}
+      </div>
+    </header>
+  </PageHero>
+
+  <div class="container article-wrap">
+    {hasToc && <div class="toc-mobile-wrap"><TableOfContents headings={tocHeadings} variant="mobile" /></div>}
+    <div class="article-grid">
+      <article class="article-main">
+        <div class="prose"><Content /></div>
+        <p class="back"><a href={withBase('/')}><Icon name="ArrowLeft" size={16} /> Back to all posts</a></p>
+      </article>
+      <aside class="sidebar" aria-label="Post sidebar">
+        <div class="sidebar-scroll">
+          {hasToc && <div class="toc-desktop"><TableOfContents headings={tocHeadings} /></div>}
+          <div class="supp"><PostInfo post={post} /><RelatedPosts posts={related} /></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/code-copy';
+  import '../../scripts/mermaid';
+  import '../../scripts/toc';
+</script>
+
+<style>
+  .article-header { padding: 40px 0 28px; max-width: 880px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  h1 {
+    margin: 0 0 12px; font-size: clamp(28px, 4.5vw, 40px); line-height: 1.2;
+    font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); overflow-wrap: anywhere;
+  }
+  .desc { margin: 0 0 16px; font-size: 18px; line-height: 1.5; color: var(--text-secondary); }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--text-muted); }
+  .meta-row span { display: inline-flex; align-items: center; gap: 6px; }
+  .diff { color: var(--accent); font-weight: 600; }
+
+  .article-wrap { padding-top: 40px; padding-bottom: 64px; }
+  .article-grid {
+    display: grid; grid-template-columns: minmax(0, 880px) 320px; gap: 40px;
+    justify-content: space-between; align-items: start;
+  }
+  .article-main, .sidebar { min-width: 0; }
+  .sidebar { position: sticky; top: 88px; }
+  .sidebar-scroll {
+    max-height: calc(100vh - 104px); overflow-y: auto; overscroll-behavior: contain;
+    display: flex; flex-direction: column; gap: 20px; padding: 2px;
+  }
+  .supp { display: flex; flex-direction: column; gap: 20px; }
+  .toc-mobile-wrap { display: none; margin-bottom: 24px; }
+  .back { margin: 48px 0 0; font-size: 15px; font-weight: 500; }
+  .back a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .back a:hover { text-decoration: underline; }
+
+  @media (max-width: 1279px) {
+    .article-grid { grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; }
+  }
+  @media (max-width: 1023px) {
+    .article-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+    .sidebar { position: static; }
+    .sidebar-scroll { max-height: none; overflow: visible; }
+    .toc-desktop { display: none; }
+    .toc-mobile-wrap { display: block; }
+    .article-wrap { padding-top: 24px; }
+  }
+  @media (max-width: 479px) {
+    .article-header { padding: 28px 0 20px; }
+    .desc { font-size: 16px; }
+  }
+</style>

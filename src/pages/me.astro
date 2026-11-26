@@ -1,0 +1,165 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { profile, type SocialKind } from '../data/profile';
+
+const socialIcon: Record<SocialKind, string> = {
+  github: 'github', linkedin: 'linkedin', youtube: 'youtube', x: 'x', facebook: 'facebook',
+  email: 'Mail', website: 'ExternalLink',
+};
+const socialLabel: Record<SocialKind, string> = {
+  github: 'GitHub', linkedin: 'LinkedIn', youtube: 'YouTube', x: 'X (Twitter)', facebook: 'Facebook',
+  email: 'Email', website: 'Website',
+};
+const p = profile;
+const showMore = p.about.length > 0 || !!p.cvUrl || !!p.quote;
+const hasLeft = p.about.length > 0 || !!p.cvUrl;
+---
+<BaseLayout active="me" title="Me" description="A bit about me, what I do, and what I am exploring.">
+  <PageHero title="Me" description="A bit about me, what I do, and what I'm exploring." />
+  <div class="container-narrow me">
+    <section class="card profile" aria-label="Profile">
+      <div class="avatar">
+        {p.avatar ? (
+          <img src={p.avatar} alt={p.avatarAlt} width="146" height="190" />
+        ) : (
+          <svg viewBox="0 0 146 190" role="img" aria-label={p.avatarAlt} preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#7DD3FC" /><stop offset="1" stop-color="#DBEAFE" />
+              </linearGradient>
+            </defs>
+            <rect width="146" height="190" fill="url(#sky)" />
+            <g fill="#fff" opacity=".95">
+              <ellipse cx="38" cy="38" rx="20" ry="9" /><ellipse cx="52" cy="32" rx="13" ry="9" />
+              <ellipse cx="112" cy="26" rx="14" ry="6" />
+            </g>
+            <path d="M-10 120 L40 62 L70 96 L100 52 L160 120 V190 H-10Z" fill="#5BBF9A" />
+            <path d="M100 52 L84 72 L96 70 L104 80 L116 68Z" fill="#E0F2FE" opacity=".8" />
+            <path d="M-10 132 C30 108 70 120 100 132 S150 128 160 120 V190 H-10Z" fill="#34D399" />
+            <path d="M-10 158 C30 140 80 150 160 138 V190 H-10Z" fill="#86EFAC" />
+            <g fill="#15803D">
+              <path d="M22 150 L32 118 L42 150Z" /><path d="M26 136 L32 112 L38 136Z" fill="#16A34A" />
+              <path d="M50 160 L62 124 L74 160Z" /><path d="M54 142 L62 116 L70 142Z" fill="#16A34A" />
+              <path d="M8 168 L18 134 L28 168Z" fill="#166534" /><path d="M112 164 L124 130 L136 164Z" fill="#166534" />
+              <path d="M96 170 L106 142 L116 170Z" />
+            </g>
+            <g fill="#78350F"><rect x="30" y="150" width="4" height="8" /><rect x="60" y="160" width="4" height="8" /></g>
+          </svg>
+        )}
+      </div>
+      <div class="info">
+        <h2 class="name">{p.name}</h2>
+        {p.role && <p class="role">{p.role}</p>}
+        {p.bio && <p class="bio">{p.bio}</p>}
+        {p.socials.length > 0 && (
+          <ul class="socials">
+            {p.socials.map((s) => (
+              <li>
+                <a href={s.url} aria-label={s.label ?? socialLabel[s.kind]} {...(s.kind !== 'email' ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                  <Icon name={socialIcon[s.kind]} size={22} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+
+    {p.interests.length > 0 && (
+      <section class="card block" aria-labelledby="h-int">
+        <h2 id="h-int" class="section-title"><Icon name="Layers" size={22} class="h-icon" /> Interests</h2>
+        <ul class="pills">
+          {p.interests.map((t, i) => <li class:list={[i % 2 === 0 ? 'green' : 'blue']}>{t}</li>)}
+        </ul>
+      </section>
+    )}
+
+    {p.currently.length > 0 && (
+      <section class="card block" aria-labelledby="h-cur">
+        <h2 id="h-cur" class="section-title"><Icon name="Target" size={22} class="h-icon" /> Currently</h2>
+        <ul class="current">
+          {p.currently.map((c) => <li><strong>{c.label}:</strong> {c.text}</li>)}
+        </ul>
+      </section>
+    )}
+
+    {showMore && (
+      <section class="card block" aria-labelledby="h-more">
+        <h2 id="h-more" class="section-title"><Icon name="Info" size={22} class="h-icon" /> More About Me</h2>
+        <div class:list={['more', { single: !hasLeft || !p.quote }]}>
+          {hasLeft && (
+            <ul class="about">
+              {p.about.map((a) => <li><Icon name={a.icon} size={20} /> <span>{a.text}</span></li>)}
+              {p.cvUrl && (
+                <li><Icon name="Code" size={20} />
+                  <a href={p.cvUrl} target="_blank" rel="noopener noreferrer">Full CV <Icon name="ExternalLink" size={15} /></a></li>
+              )}
+            </ul>
+          )}
+          {p.quote && (
+            <blockquote class:list={['quote', { solo: !hasLeft }]}>
+              <Icon name="Quote" size={26} class="q-icon" />
+              <p>{p.quote}</p>
+              <svg class="scribble" viewBox="0 0 120 12" aria-hidden="true" preserveAspectRatio="none">
+                <path d="M3 8 C30 3 60 10 117 4" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round" />
+              </svg>
+            </blockquote>
+          )}
+        </div>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .me { padding-top: 32px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 20px; }
+  .block, .profile { padding: 20px 24px; }
+  .section-title { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-size: 20px; font-weight: 700; color: var(--text-primary); }
+  .me :global(.h-icon) { color: var(--accent); }
+
+  .profile { display: grid; grid-template-columns: 146px minmax(0, 1fr); gap: 28px; align-items: start; }
+  .avatar { width: 146px; height: 190px; border-radius: var(--radius-xl); overflow: hidden; background: var(--surface-secondary); }
+  .avatar svg, .avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .name { margin: 0; font-size: 30px; font-weight: 800; line-height: 1.2; }
+  .role { margin: 4px 0 12px; font-size: 16px; color: var(--text-secondary); }
+  .bio { margin: 0 0 14px; font-size: 15px; line-height: 1.65; color: var(--text-secondary); }
+  .socials { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .socials a {
+    display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px;
+    border-radius: var(--radius-full); color: var(--text-secondary); transition: background var(--transition), color var(--transition);
+  }
+  .socials a:hover { background: var(--accent-soft); color: var(--accent-text); }
+
+  .pills { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+  .pills li { padding: 6px 16px; border-radius: var(--radius-full); font-size: 14px; font-weight: 500; line-height: 1.5; }
+  .pills .green { background: var(--accent-soft); color: var(--accent-text); }
+  .pills .blue { background: var(--blue-soft); color: var(--blue-text); }
+
+  .current { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 15px; color: var(--text-secondary); }
+  .current li { position: relative; padding-left: 24px; }
+  .current li::before { content: ''; position: absolute; left: 4px; top: 0.6em; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .current strong { color: var(--text-primary); font-weight: 600; }
+
+  .more { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+  .more.single { grid-template-columns: minmax(0, 1fr); }
+  .about { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; font-size: 15px; }
+  .about li { display: flex; align-items: center; gap: 14px; color: var(--text-primary); }
+  .about li > :global(svg:first-child) { color: var(--text-secondary); flex: none; }
+  .about a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--text-primary); }
+  .about a:hover { color: var(--link); }
+  .quote { position: relative; margin: 0; padding: 4px 0 8px 32px; border-left: 1px solid var(--border); }
+  .quote.solo { border: 0; padding: 4px 0 8px; }
+  .quote :global(.q-icon) { color: var(--accent); }
+  .quote p { margin: 4px 0 0; font-size: 18px; font-style: italic; line-height: 1.55; color: var(--text-secondary); }
+  .scribble { display: block; width: 120px; height: 12px; margin-top: 8px; }
+
+  @media (max-width: 767px) {
+    .profile { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 16px; }
+    .avatar { width: 120px; height: 156px; }
+    .more { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .quote { border-left: 0; border-top: 1px solid var(--border); padding: 16px 0 0; }
+    .block { padding: 16px; }
+  }
+</style>

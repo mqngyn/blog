@@ -1,0 +1,30 @@
+---
+---
+
+<div class="hero-waves" aria-hidden="true">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 160" preserveAspectRatio="xMaxYMax slice" focusable="false">
+    <path d="M210 160 C330 150 370 70 450 97 S570 28 680 48 V160Z" fill="#38BDF8" opacity=".22" />
+    <path d="M340 160 C420 125 480 22 550 48 S630 62 680 16 V160Z" fill="#14B8A6" opacity=".30" />
+    <path d="M450 160 Q540 85 600 80 T680 40 V160Z" fill="#22C55E" opacity=".20" />
+    <circle cx="470" cy="40" r="2.2" fill="#fff" opacity=".9" />
+    <circle cx="610" cy="22" r="1.8" fill="#fff" opacity=".8" />
+    <circle cx="640" cy="104" r="2.6" fill="#fff" opacity=".9" />
+    <circle cx="395" cy="95" r="1.6" fill="#fff" opacity=".7" />
+  </svg>
+</div>
+
+<style>
+  .hero-waves {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(680px, 62%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero-waves svg { display: block; width: 100%; height: 100%; max-width: none; }
+  :global([data-theme='dark']) .hero-waves { opacity: 0.75; }
+  @media (max-width: 767px) { .hero-waves { width: 70%; opacity: 0.55; } }
+  @media (max-width: 479px) { .hero-waves { display: none; } }
+</style>

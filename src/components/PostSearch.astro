@@ -1,0 +1,86 @@
+---
+import Icon from './Icon.astro';
+import { withBase } from '../utils/url';
+
+interface Props {
+  tags: { tag: string; slug: string; count: number }[];
+  categories: { name: string; slug: string; count: number }[];
+}
+const { tags, categories } = Astro.props;
+const tagSlugs = new Set(tags.map((t) => t.slug));
+const cats = categories.filter((c) => !tagSlugs.has(c.slug));
+---
+<div class="post-search" data-post-search data-search-url={withBase('/search.json')}>
+  <form class="controls" role="search" onsubmit="return false">
+    <label class="search-box">
+      <span class="sr-only">Search posts</span>
+      <Icon name="Search" size={20} class="s-icon" />
+      <input type="search" data-search-input placeholder="Search posts..." autocomplete="off" spellcheck="false" />
+      <span class="kbd" aria-hidden="true"><kbd>Ctrl</kbd><kbd>K</kbd></span>
+    </label>
+    <label class="tag-box">
+      <span class="sr-only">Filter by tag</span>
+      <Icon name="Tag" size={18} class="t-icon" />
+      <select data-tag-select>
+        <option value="">All Tags</option>
+        {tags.length > 0 && (
+          <optgroup label="Tags">
+            {tags.map((t) => <option value={t.slug}>{t.tag} ({t.count})</option>)}
+          </optgroup>
+        )}
+        {cats.length > 0 && (
+          <optgroup label="Categories">
+            {cats.map((c) => <option value={c.slug}>{c.name} ({c.count})</option>)}
+          </optgroup>
+        )}
+      </select>
+      <Icon name="ChevronDown" size={18} class="c-icon" />
+    </label>
+  </form>
+  <p class="sr-only" role="status" aria-live="polite" data-live></p>
+</div>
+
+<style>
+  .post-search { margin: 32px 0 24px; }
+  .controls { display: flex; gap: 16px; flex-wrap: wrap; }
+  .search-box, .tag-box {
+    position: relative; display: flex; align-items: center; height: 48px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-full); box-shadow: var(--shadow-card);
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .search-box:hover, .tag-box:hover { border-color: var(--accent); }
+  .search-box:focus-within, .tag-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .search-box { flex: 1 1 280px; min-width: 0; padding: 0 12px 0 18px; gap: 12px; }
+  .search-box :global(.s-icon) { color: var(--text-secondary); flex: none; }
+  input {
+    flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; outline: 0;
+    font: inherit; font-size: 15px; color: var(--text-primary);
+  }
+  input::placeholder { color: var(--text-muted); }
+  input::-webkit-search-cancel-button { display: none; }
+  .kbd { display: inline-flex; gap: 4px; flex: none; }
+  kbd {
+    font-family: var(--font-sans); font-size: 12px; line-height: 1; padding: 5px 8px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface-secondary); color: var(--text-secondary);
+  }
+  .tag-box { flex: 0 0 200px; padding: 0 16px 0 18px; }
+  .tag-box :global(.t-icon) { position: absolute; left: 18px; color: var(--text-secondary); pointer-events: none; }
+  .tag-box :global(.c-icon) { position: absolute; right: 16px; color: var(--text-secondary); pointer-events: none; }
+  select {
+    appearance: none; -webkit-appearance: none; width: 100%; height: 100%;
+    padding: 0 28px 0 30px; border: 0; background: transparent; outline: 0;
+    font: inherit; font-size: 15px; font-weight: 500; color: var(--text-primary); cursor: pointer;
+    text-overflow: ellipsis;
+  }
+  select option, select optgroup { background: var(--surface); color: var(--text-primary); }
+  @media (max-width: 767px) {
+    .kbd { display: none; }
+    .tag-box { flex: 1 1 100%; }
+  }
+</style>
+
+<script>
+  import '../scripts/post-filter';
+</script>

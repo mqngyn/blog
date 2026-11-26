@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import PostCard from '../components/PostCard.astro';
+import PostSearch from '../components/PostSearch.astro';
+import Icon from '../components/Icon.astro';
+import { SITE } from '../config';
+import { getPublishedPosts, getAllTags, getAllCategories } from '../utils/posts';
+
+const posts = await getPublishedPosts();
+const tags = getAllTags(posts);
+const categories = getAllCategories(posts);
+---
+<BaseLayout active="posts" title="Posts" description={SITE.description}>
+  <PageHero title="Posts" description={SITE.description} />
+  <div class="container-narrow posts-wrap">
+    {posts.length === 0 ? (
+      <div class="empty card">
+        <Icon name="FileText" size={40} class="empty-icon" />
+        <h2>No posts yet</h2>
+        <p>Add a Markdown file to <code>src/content/posts/</code> and it will show up here.</p>
+      </div>
+    ) : (
+      <>
+        <PostSearch tags={tags} categories={categories} />
+        <ul class="post-list">
+          {posts.map((post) => (
+            <li data-card-wrap><PostCard post={post} /></li>
+          ))}
+        </ul>
+        <div class="empty card" data-empty hidden>
+          <Icon name="SearchX" size={40} class="empty-icon" />
+          <h2>No posts match your search</h2>
+          <p>Try different keywords or choose another tag.</p>
+          <button type="button" class="btn" data-clear>Clear filters</button>
+        </div>
+      </>
+    )}
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .post-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+  .post-list > li[hidden], .post-card[hidden] { display: none !important; }
+</style>
+<style>
+  .posts-wrap { padding-bottom: 64px; }
+  .empty { text-align: center; padding: 48px 24px; margin-top: 32px; }
+  .empty[hidden] { display: none; }
+  .empty :global(.empty-icon) { color: var(--text-muted); }
+  .empty h2 { margin: 12px 0 4px; font-size: 20px; font-weight: 700; }
+  .empty p { margin: 0 0 16px; color: var(--text-secondary); font-size: 15px; }
+  .btn {
+    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    padding: 8px 18px; border-radius: var(--radius-full);
+    border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-text);
+    transition: background var(--transition);
+  }
+  .btn:hover { background: var(--accent); color: #fff; }
+</style>

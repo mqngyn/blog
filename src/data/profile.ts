@@ -33,41 +33,38 @@ export interface Profile {
   quote: string;
 }
 
+// ⚠️ MOCK DATA (lấy từ mockup) — chỉ để kiểm tra UI. Thay bằng thông tin thật trước khi deploy.
 export const profile: Profile = {
-  name: 'mq',
-  role: 'Computer Science · Security & Cryptography',
-  bio: 'This blog is where I write my notes, learning materials, and CTF write-ups on computer science, web security, applied cryptography, and the math behind them.',
+  name: 'Minh Anh',
+  role: 'CS Student · Security & Cryptography Enthusiast',
+  bio: "Year 4 Computer Science student at HCMUT. I'm interested in security (especially web security and applied cryptography), competitive CTF, and building useful things. This blog is where I write my notes, learning materials, and CTF write-ups.",
 
-  // TODO: điền thông tin của bạn — ví dụ: '/avatar.jpg' (đặt file trong thư mục public/)
+  // Để trống -> dùng hình minh hoạ mặc định. Ví dụ: '/avatar.jpg' (đặt file trong public/)
   avatar: '',
   avatarAlt: 'Illustration of green mountains and trees',
 
-  // TODO: điền thông tin của bạn
-  // Ví dụ:
-  // { kind: 'github', url: 'https://github.com/username' },
-  // { kind: 'linkedin', url: 'https://www.linkedin.com/in/username' },
-  // { kind: 'youtube', url: 'https://www.youtube.com/@username' },
-  // { kind: 'email', url: 'mailto:you@example.com' },
-  // { kind: 'website', url: 'https://example.com' },
-  socials: [],
+  socials: [
+    { kind: 'github', url: 'https://github.com/username' },
+    { kind: 'linkedin', url: 'https://www.linkedin.com/in/username' },
+    { kind: 'youtube', url: 'https://www.youtube.com/@username' },
+    { kind: 'email', url: 'mailto:you@example.com' },
+    { kind: 'website', url: 'https://example.com' },
+  ],
 
-  interests: ['Cryptography', 'Web Security', 'CTF', 'Binary Exploitation', 'Linux', 'Networking'],
+  interests: ['Web Security', 'Cryptography', 'CTF', 'Linux', 'Networking', 'Cloud (AWS)'],
 
-  // TODO: điền thông tin của bạn
-  // Ví dụ:
-  // { label: 'Learning', text: 'lattice-based cryptography' },
-  // { label: 'Practicing', text: 'CTF regularly' },
-  // { label: 'Building', text: 'this blog with my notes and write-ups' },
-  currently: [],
+  currently: [
+    { label: 'Learning', text: 'HTB Web Penetration Tester path' },
+    { label: 'Practicing', text: 'CTF regularly with BKISC' },
+    { label: 'Building', text: 'blog with my notes and write-ups' },
+  ],
 
-  // TODO: điền thông tin của bạn
-  // Ví dụ:
-  // { icon: 'GraduationCap', text: 'Computer Science @ Your University' },
-  // { icon: 'Users', text: 'Member of Your Community' },
-  about: [],
+  about: [
+    { icon: 'GraduationCap', text: 'Computer Science @ HCMUT' },
+    { icon: 'Users', text: 'Member of BKISC (Crypto ban)' },
+  ],
 
-  // TODO: điền thông tin của bạn — ví dụ: 'https://example.com/cv.pdf'
-  cvUrl: '',
+  cvUrl: 'https://example.com/cv.pdf',
 
   quote: 'Learn, build, break, and share what I learn.',
 };
